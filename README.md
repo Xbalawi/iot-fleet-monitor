@@ -76,7 +76,28 @@ iot-fleet-monitor/
 
 ## Status
 
-🚧 Work in progress — following a structured build plan (see commit history for progress).
+🚧 Work in progress — following a structured build plan.
+
+## Build progress
+
+### Week 1 — Foundations & data pipeline
+- [x] Repo structure + initial README
+- [x] Local MQTT broker running via Docker (Mosquitto)
+- [x] Sensor simulator publishing readings (temperature, vibration, occupancy)
+- [ ] Flask backend: MQTT listener
+- [ ] Flask backend: persistence layer (SQLAlchemy + SQLite)
+
+### Week 2 — Reliability, anomaly detection, dashboard
+- [ ] Retry logic + health checks on ingestion
+- [ ] Anomaly detection (threshold/z-score, then Isolation Forest)
+- [ ] Dashboard: live readings + historical trends
+- [ ] Dashboard: anomaly flags
+
+### Week 3 — Hardening, DevOps, polish
+- [ ] Dockerize full stack (docker-compose)
+- [ ] GitHub Actions CI (tests + linting)
+- [ ] Full documentation pass (setup guide, design rationale)
+- [ ] Demo GIF/video + final polish
 
 ## Setup
 
