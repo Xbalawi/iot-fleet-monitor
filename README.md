@@ -1,1 +1,87 @@
-# iot-fleet-monitor
+# IoT Fleet Monitor
+
+A simulated industrial IoT monitoring system: sensor data flows through an MQTT broker into a Flask backend that stores readings, detects anomalies, and exposes them through a REST API and a live dashboard.
+
+Built as a learning/portfolio project to practice distributed-systems patterns (pub/sub messaging), backend engineering, applied ML on streaming data, and DevOps practices (containerization, CI/CD).
+
+## Architecture
+
+```
+┌─────────────┐      MQTT publish       ┌─────────────┐
+│  Sensor      │  (JSON: sensor_id,      │             │
+│  Simulator   │   type, value,          │   MQTT      │
+│  (Python)    │   timestamp)            │   Broker    │
+│              │ ───────────────────────▶│  (Mosquitto)│
+└─────────────┘                          └──────┬──────┘
+                                                 │ MQTT subscribe
+                                                 ▼
+                                          ┌─────────────┐
+                                          │   Flask      │
+                                          │   Backend    │
+                                          │  - subscribes│
+                                          │  - stores    │
+                                          │  - detects   │
+                                          │    anomalies │
+                                          └──────┬──────┘
+                                                 │
+                                    ┌────────────┼────────────┐
+                                    ▼                          ▼
+                             ┌─────────────┐          ┌──────────────┐
+                             │  Database    │          │  REST API    │
+                             │  (SQLite→    │          │  endpoints   │
+                             │  Postgres)   │          │  (/readings, │
+                             └─────────────┘          │  /anomalies) │
+                                                        └──────┬───────┘
+                                                               │ HTTP GET
+                                                               ▼
+                                                        ┌──────────────┐
+                                                        │  Dashboard    │
+                                                        │  (Flask +     │
+                                                        │  Chart.js)    │
+                                                        └──────────────┘
+```
+
+## Design decisions
+
+- **MQTT over direct HTTP calls from sensors**: decouples data producers from consumers. Sensors don't know or care who's listening, so the system can add new consumers (e.g. a logging service) without touching sensor code, and a backend outage doesn't take down data production.
+- **Backend split into logical responsibilities** (subscribe, store, detect) even while running as a single process initially — this keeps the door open to splitting into microservices later without a rewrite.
+- **SQLite via SQLAlchemy ORM**: zero setup to start, but swapping to Postgres/openGauss later is a config change, not a rewrite.
+- **Dashboard talks only to the REST API**, never the database directly, so the frontend can be replaced independently of the backend.
+
+## Tech stack
+
+- **Sensors**: Python, `paho-mqtt`
+- **Broker**: Mosquitto (MQTT)
+- **Backend**: Flask, SQLAlchemy, scikit-learn (anomaly detection)
+- **Dashboard**: Flask + Chart.js
+- **Infra**: Docker, docker-compose
+- **CI**: GitHub Actions (tests + linting)
+
+## Project structure
+
+```
+iot-fleet-monitor/
+├── sensors/
+│   └── simulator.py
+├── backend/
+│   ├── app.py
+│   ├── models.py
+│   └── mqtt_listener.py
+├── dashboard/
+│   └── templates/
+├── docker-compose.yml
+├── requirements.txt
+└── README.md
+```
+
+## Status
+
+🚧 Work in progress — following a structured build plan (see commit history for progress).
+
+## Setup
+
+_To be filled in once the Docker setup is complete._
+
+## License
+
+MIT
