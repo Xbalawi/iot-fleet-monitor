@@ -84,8 +84,8 @@ iot-fleet-monitor/
 - [x] Repo structure + initial README
 - [x] Local MQTT broker running via Docker (Mosquitto)
 - [x] Sensor simulator publishing readings (temperature, vibration, occupancy)
-- [ ] Flask backend: MQTT listener
-- [ ] Flask backend: persistence layer (SQLAlchemy + SQLite)
+- [x] Flask backend: MQTT listener
+- [x] Flask backend: persistence layer (SQLAlchemy + SQLite)
 
 ### Week 2 — Reliability, anomaly detection, dashboard
 - [ ] Retry logic + health checks on ingestion
