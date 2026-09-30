@@ -1,5 +1,5 @@
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 import paho.mqtt.client as mqtt
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -10,18 +10,22 @@ BROKER_HOST = "localhost"
 BROKER_PORT = 1883
 TOPIC = "sensors/readings"
 REQUIRED_FIELDS = {"sensor_id", "type", "value", "timestamp"}
+connection_state = {"connected": False, "last_message_at": None}
 
 
 def on_connect(client, userdata, flags, reason_code, properties=None):
     if reason_code == 0:
+        connection_state["connected"] = True
         print(f"Connected to broker successfully (Code: {reason_code})")
         client.subscribe(TOPIC)
         print(f"Subscribed to topic: '{TOPIC}'\nWaiting for messages...")
     else:
+        connection_state["connected"] = False
         print(f"Connection failed with reason code: {reason_code}")
 
 
 def on_message(client, userdata, msg):
+    connection_state["last_message_at"] = datetime.now(timezone.utc)
     app = userdata  # We passed the Flask app via user_data_set()
     
     try:
@@ -67,6 +71,16 @@ def on_message(client, userdata, msg):
             print(f"[DB ERROR] Failed to insert record, transaction rolled back. Error: {e}")
 
 
+def on_disconnect(client, userdata, flags, reason_code, properties=None):
+    connection_state["connected"] = False
+    if reason_code != 0:
+        # Paho will attempt to reconnect automatically when the connection drops unexpectedly.
+        print(f"[WARNING] Unexpected disconnection. Reason code: {reason_code}")
+    else:
+        print("Disconnected from broker gracefully.")
+    
+
+
 def create_client():
     try:
         client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
@@ -75,6 +89,7 @@ def create_client():
 
     client.on_connect = on_connect
     client.on_message = on_message
+    client.on_disconnect = on_disconnect
     return client
 
 
