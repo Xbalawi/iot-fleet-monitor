@@ -88,7 +88,8 @@ iot-fleet-monitor/
 - [x] Flask backend: persistence layer (SQLAlchemy + SQLite)
 
 ### Week 2 — Reliability, anomaly detection, dashboard
-- [ ] Retry logic + health checks on ingestion
+- [x] MQTT disconnect/reconnect visibility
+- [ ] Health check endpoint reporting real pipeline status
 - [ ] Anomaly detection (threshold/z-score, then Isolation Forest)
 - [ ] Dashboard: live readings + historical trends
 - [ ] Dashboard: anomaly flags
@@ -101,7 +102,41 @@ iot-fleet-monitor/
 
 ## Setup
 
-_To be filled in once the Docker setup is complete._
+**Prerequisites:** Python 3.12+, Docker Desktop
+
+**1. Clone the repo and install dependencies**
+```bash
+git clone https://github.com/Xbalawi/iot-fleet-monitor.git
+cd iot-fleet-monitor
+pip install -r requirements.txt
+```
+
+**2. Start the MQTT broker**
+```bash
+docker run -d -p 1883:1883 --name mosquitto eclipse-mosquitto
+```
+
+**3. Run the backend** (in one terminal)
+```bash
+cd backend
+python app.py
+```
+
+**4. Run the sensor simulator** (in a second terminal)
+```bash
+python sensors/simulator.py
+```
+
+**5. Check it's working**
+- `http://localhost:5000/health` — pipeline status
+- `http://localhost:5000/readings` — latest sensor readings (JSON)
+
+## API endpoints
+
+| Endpoint | Method | Description |
+|---|---|---|
+| `/health` | GET | Reports whether the MQTT pipeline is connected and receiving data |
+| `/readings` | GET | Returns the most recent sensor readings (`?limit=` to control how many, default 50, max 500) |
 
 ## License
 
