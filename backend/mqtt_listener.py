@@ -30,8 +30,12 @@ def on_message(client, userdata, msg):
     except json.JSONDecodeError:
         print(f"[WARNING] Received malformed JSON: {msg.payload}")
         return
+    
+    if not isinstance(data["value"], (int, float)):
+        print(f"[WARNING] 'value' is not numeric: {data['value']!r}")
+        return
 
-    if not REQUIRED_FIELDS.issubset(data.keys()):
+    elif not REQUIRED_FIELDS.issubset(data.keys()):
         print(f"[WARNING] Missing required fields. Payload keys: {list(data.keys())}")
         return
 
@@ -57,7 +61,7 @@ def on_message(client, userdata, msg):
             db.session.commit()
             print(f"[SAVED] {data['sensor_id']} ({data['type']}): {data['value']}")
             
-        except SQLAlchemyError as e:
+        except (SQLAlchemyError, TypeError, ValueError) as e:
             # 3. Rollback the session if the database throws an error (e.g. constraints, connection drop)
             db.session.rollback()
             print(f"[DB ERROR] Failed to insert record, transaction rolled back. Error: {e}")
