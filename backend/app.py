@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request
 from models import db, Reading
-from mqtt_listener import start_listener
+from mqtt_listener import start_listener, connection_state
+from datetime import datetime, timezone
 
 def create_app():
     app = Flask(__name__)
@@ -18,7 +19,43 @@ def create_app():
 
     @app.route("/health")
     def health():
-        return jsonify({"status": "ok"})
+        is_connected = connection_state.get("connected", False)
+        last_message_at = connection_state.get("last_message_at")
+
+        # State 1: Disconnected from MQTT broker entirely
+        if not is_connected:
+            return jsonify({
+                "status": "degraded",
+                "connected": False,
+                "reason": "Broker disconnected",
+                "last_message_seconds_ago": None
+            }), 503
+
+        # State 2: Connected, but startup window (no messages received yet)
+        if last_message_at is None:
+            return jsonify({
+                "status": "ok",
+                "connected": True,
+                "reason": "Connected; awaiting initial message stream",
+                "last_message_seconds_ago": None
+            }), 200
+
+        # State 3: Connected & streaming — check message freshness
+        seconds_ago = (datetime.now(timezone.utc) - last_message_at).total_seconds()
+        
+        if seconds_ago <= 30:
+            return jsonify({
+                "status": "ok",
+                "connected": True,
+                "last_message_seconds_ago": round(seconds_ago, 2)
+            }), 200
+        else:
+            return jsonify({
+                "status": "degraded",
+                "connected": True,
+                "reason": f"Message stream stale (silent for {round(seconds_ago, 1)}s)",
+                "last_message_seconds_ago": round(seconds_ago, 2)
+            }), 503
 
     @app.route("/readings")
     def readings():
@@ -34,7 +71,6 @@ def create_app():
         recent_readings = Reading.query.order_by(Reading.received_at.desc()).limit(limit).all()
         
         # Convert the SQLAlchemy objects to a list of dictionaries
-        # (This dynamically grabs all columns from the Reading model)
         result = [
             {column.name: getattr(reading, column.name) for column in reading.__table__.columns}
             for reading in recent_readings
