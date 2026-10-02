@@ -2,7 +2,7 @@ import json
 from datetime import datetime, timezone
 import paho.mqtt.client as mqtt
 from sqlalchemy.exc import SQLAlchemyError
-from anomaly import is_anomalous  
+from anomaly import is_anomalous, maybe_retrain  
 
 # Import the database and model we just created
 from models import db, Reading
@@ -68,6 +68,7 @@ def on_message(client, userdata, msg):
 
             db.session.add(new_reading)
             db.session.commit()
+            maybe_retrain(data['type'])  # Update ML retraining counters after successful commit
 
             status_tag = "[ANOMALY]" if anomaly_flag else ""
             print(f"[SAVED] {status_tag} {data['sensor_id']} ({data['type']}): {data['value']}")
