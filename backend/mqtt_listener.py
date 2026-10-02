@@ -2,6 +2,7 @@ import json
 from datetime import datetime, timezone
 import paho.mqtt.client as mqtt
 from sqlalchemy.exc import SQLAlchemyError
+from anomaly import is_anomalous  
 
 # Import the database and model we just created
 from models import db, Reading
@@ -35,12 +36,12 @@ def on_message(client, userdata, msg):
         print(f"[WARNING] Received malformed JSON: {msg.payload}")
         return
     
-    if not isinstance(data["value"], (int, float)):
-        print(f"[WARNING] 'value' is not numeric: {data['value']!r}")
+    if not REQUIRED_FIELDS.issubset(data.keys()):
+        print(f"[WARNING] Missing required fields. Payload keys: {list(data.keys())}")
         return
 
-    elif not REQUIRED_FIELDS.issubset(data.keys()):
-        print(f"[WARNING] Missing required fields. Payload keys: {list(data.keys())}")
+    elif not isinstance(data["value"], (int, float)):
+        print(f"[WARNING] 'value' is not numeric: {data['value']!r}")
         return
 
     # 1. Parse the ISO 8601 timestamp safely
@@ -55,15 +56,21 @@ def on_message(client, userdata, msg):
     # 2. Push the Flask application context so SQLAlchemy knows which database to use
     with app.app_context():
         try:
+            anomaly_flag = is_anomalous(data['type'], data['value'])
+
             new_reading = Reading(
                 sensor_id=data['sensor_id'],
                 type=data['type'],
                 value=data['value'],
-                timestamp=timestamp_obj
+                timestamp=timestamp_obj,
+                is_anomaly=anomaly_flag
             )
+
             db.session.add(new_reading)
             db.session.commit()
-            print(f"[SAVED] {data['sensor_id']} ({data['type']}): {data['value']}")
+
+            status_tag = "[ANOMALY]" if anomaly_flag else ""
+            print(f"[SAVED] {status_tag} {data['sensor_id']} ({data['type']}): {data['value']}")
             
         except (SQLAlchemyError, TypeError, ValueError) as e:
             # 3. Rollback the session if the database throws an error (e.g. constraints, connection drop)

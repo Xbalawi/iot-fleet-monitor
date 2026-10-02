@@ -90,7 +90,7 @@ iot-fleet-monitor/
 ### Week 2 — Reliability, anomaly detection, dashboard
 - [x] MQTT disconnect/reconnect visibility
 - [x] Health check endpoint reporting real pipeline status
-- [ ] Anomaly detection (threshold/z-score, then Isolation Forest)
+- [x] Anomaly detection (threshold/z-score, then Isolation Forest)
 - [ ] Dashboard: live readings + historical trends
 - [ ] Dashboard: anomaly flags
 
