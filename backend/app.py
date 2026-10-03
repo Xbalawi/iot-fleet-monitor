@@ -1,7 +1,9 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template
 from models import db, Reading
 from mqtt_listener import start_listener, connection_state
 from datetime import datetime, timezone
+
+
 
 def create_app():
     app = Flask(__name__)
@@ -77,6 +79,10 @@ def create_app():
         ]
         
         return jsonify(result)
+
+    @app.route("/")
+    def dashboard():
+        return render_template("dashboard.html")
 
     return app
 

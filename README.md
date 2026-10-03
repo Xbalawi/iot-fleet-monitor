@@ -93,7 +93,7 @@ iot-fleet-monitor/
 - [x] MQTT disconnect/reconnect visibility
 - [x] Health check endpoint reporting real pipeline status
 - [x] Anomaly detection (threshold/z-score, then Isolation Forest)
-- [ ] Dashboard: live readings + historical trends
+- [x] Dashboard: live readings + historical trends
 - [ ] Dashboard: anomaly flags
 
 ### Week 3 — Hardening, DevOps, polish
