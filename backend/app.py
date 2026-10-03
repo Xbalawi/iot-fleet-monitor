@@ -61,23 +61,19 @@ def create_app():
 
     @app.route("/readings")
     def readings():
-        # Read the ?limit= query param, default to 50
         try:
             limit = int(request.args.get("limit", 50))
-            # Cap the limit at 500
             limit = min(limit, 500)
         except ValueError:
-            limit = 50  # Fallback if the user passes a non-integer string
+            limit = 50
 
-        # Query newest first
-        recent_readings = Reading.query.order_by(Reading.received_at.desc()).limit(limit).all()
-        
-        # Convert the SQLAlchemy objects to a list of dictionaries
-        result = [
-            {column.name: getattr(reading, column.name) for column in reading.__table__.columns}
-            for reading in recent_readings
-        ]
-        
+        rows = Reading.query.order_by(Reading.received_at.desc()).limit(limit).all()
+        result = []
+        for r in rows:
+            row_dict = {c.name: getattr(r, c.name) for c in r.__table__.columns}
+            row_dict["timestamp"] = r.timestamp.isoformat()
+            row_dict["received_at"] = r.received_at.isoformat()
+            result.append(row_dict)
         return jsonify(result)
 
     @app.route("/")
@@ -85,6 +81,7 @@ def create_app():
         return render_template("dashboard.html")
 
     return app
+
 
 if __name__ == "__main__":
     app = create_app()

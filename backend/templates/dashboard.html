@@ -13,9 +13,15 @@
         /* Visually flag anomalous rows */
         .anomaly-row { background-color: #fee2e2; color: #991b1b; font-weight: bold; }
     </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
 </head>
 <body>
     <h1>IoT Fleet Monitor</h1>
+    <div style="position: relative; margin-bottom: 30px; height: 300px;">
+        <canvas id="readings-chart"></canvas>
+    </div>
     <table id="readings-table">
         <thead>
             <tr>
@@ -32,11 +38,79 @@
     </table>
 
     <script>
+        let chart = null;
+
+        function groupAndSort(data) {
+            const grouped = { temperature: [], vibration: [] };
+    
+            // Group and format the data
+            data.forEach(reading => {
+                if (reading.type === 'temperature' || reading.type === 'vibration') {
+                    grouped[reading.type].push({
+                        x: reading.timestamp,
+                        y: reading.value,
+                        anomaly: reading.is_anomaly
+                    });
+                }
+            });
+
+            // Sort ascending (oldest first) because Chart.js expects left-to-right time data
+            grouped.temperature.sort((a, b) => new Date(a.x) - new Date(b.x));
+            grouped.vibration.sort((a, b) => new Date(a.x) - new Date(b.x));
+
+            return grouped;
+        }
+
+        function updateChart(data) {
+            const grouped = groupAndSort(data);
+
+            if (chart === null) {
+                const ctx = document.getElementById('readings-chart');
+                chart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        datasets: [
+                            { 
+                                label: 'Temperature (°C)', 
+                                data: grouped.temperature, 
+                                borderColor: 'orange', 
+                                tension: 0.2 
+                            },
+                            { 
+                                label: 'Vibration (mm/s)', 
+                                data: grouped.vibration, 
+                                borderColor: 'steelblue', 
+                                tension: 0.2 
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: { 
+                                type: 'time', 
+                                time: { unit: 'second' } 
+                            }
+                        }
+                    }
+                });
+            } else {
+                // Update data in-place and trigger a re-render
+                chart.data.datasets[0].data = grouped.temperature;
+                chart.data.datasets[1].data = grouped.vibration;
+                chart.update();
+            }
+        }
+        
         async function loadReadings() {
             try {
                 // 1. Fetch the data
-                const response = await fetch('/readings?limit=20');
+                const response = await fetch('/readings?limit=50'); // Bumped to 50 for a better looking chart
                 const data = await response.json();
+
+                // Render chart
+                updateChart(data);
                 
                 // 2. Get the tbody and clear old rows
                 const tbody = document.getElementById('readings-body');

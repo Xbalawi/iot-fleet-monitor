@@ -94,7 +94,7 @@ iot-fleet-monitor/
 - [x] Health check endpoint reporting real pipeline status
 - [x] Anomaly detection (threshold/z-score, then Isolation Forest)
 - [x] Dashboard: live readings + historical trends
-- [ ] Dashboard: anomaly flags
+- [x] Dashboard: anomaly flags
 
 ### Week 3 — Hardening, DevOps, polish
 - [ ] Dockerize full stack (docker-compose)
