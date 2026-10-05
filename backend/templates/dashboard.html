@@ -61,7 +61,58 @@
             return grouped;
         }
 
-        function updateChart(data) {
+
+    function updateChart(data) {
+        const grouped = groupAndSort(data);
+
+        if (chart === null) {
+            const ctx = document.getElementById('readings-chart');
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    datasets: [
+                        { 
+                            label: 'Temperature (°C)', 
+                            data: grouped.temperature, 
+                            borderColor: 'orange', 
+                            tension: 0.2,
+                            pointBackgroundColor: (ctx) => ctx.raw?.anomaly ? 'red' : 'orange',
+                            pointRadius: (ctx) => ctx.raw?.anomaly ? 6 : 2,
+                            pointBorderColor: (ctx) => ctx.raw?.anomaly ? 'darkred' : 'orange'
+                        },
+                        { 
+                            label: 'Vibration (mm/s)', 
+                            data: grouped.vibration, 
+                            borderColor: 'steelblue', 
+                            tension: 0.2,
+                            pointBackgroundColor: (ctx) => ctx.raw?.anomaly ? 'red' : 'steelblue',
+                        pointRadius: (ctx) => ctx.raw?.anomaly ? 6 : 2,
+                        pointBorderColor: (ctx) => ctx.raw?.anomaly ? 'darkred' : 'steelblue'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: { 
+                            type: 'time', 
+                            time: { unit: 'second' } 
+                        }
+                    }
+                }
+            });
+        } else {
+            // As chart.update() re-evaluates point callbacks against the fresh array,
+            // new anomalies will automatically render as large red dots without touching config.
+            chart.data.datasets[0].data = grouped.temperature;
+            chart.data.datasets[1].data = grouped.vibration;
+            chart.update();
+        }
+    }       
+
+
+        /* Old Version of updateChart function */
+        /* function updateChart(data) {
             const grouped = groupAndSort(data);
 
             if (chart === null) {
@@ -101,7 +152,7 @@
                 chart.data.datasets[1].data = grouped.vibration;
                 chart.update();
             }
-        }
+        } */
         
         async function loadReadings() {
             try {
