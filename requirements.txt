@@ -1,6 +1,13 @@
+# For MQTT communication
 paho-mqtt
 flask
 flask-sqlalchemy
 
+
+# For Data Science
 scikit-learn
 numpy
+
+
+# For Testing the rules
+pytest
