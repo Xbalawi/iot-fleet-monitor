@@ -35,3 +35,18 @@ def test_valid_reading_gets_saved(test_app):
         readings = Reading.query.all()
         assert len(readings) == 1
 
+
+def test_invalid_payload_is_rejected(test_app):
+    with test_app.app_context():
+        payload = {
+            "sensor_id": "temp-01",
+            "type": "temperature",
+            "value": "not-a-number",  # invalid — should be rejected
+            "timestamp": "2026-06-10T12:00:00+00:00"
+        }
+        msg = FakeMessage(payload)
+        on_message(None, test_app, msg)
+
+        readings = Reading.query.all()
+        assert len(readings) == 0
+
