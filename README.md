@@ -97,6 +97,7 @@ iot-fleet-monitor/
 - [x] Dashboard: anomaly flags
 
 ### Week 3 — Hardening, DevOps, polish
+- [x] Tests
 - [ ] Dockerize full stack (docker-compose)
 - [ ] GitHub Actions CI (tests + linting)
 - [ ] Full documentation pass (setup guide, design rationale)
