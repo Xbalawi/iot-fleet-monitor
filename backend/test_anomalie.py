@@ -19,4 +19,3 @@ def test_high_vibration_is_anomalous():
 def test_low_vibration_is_not_anomalous():
     assert threshold_check("vibration", 0) == False
 
-    
