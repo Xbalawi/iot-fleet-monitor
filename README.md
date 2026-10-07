@@ -44,10 +44,12 @@ Built as a learning/portfolio project to practice distributed-systems patterns (
 ## Design decisions
 
 - **MQTT over direct HTTP calls from sensors**: decouples data producers from consumers. Sensors don't know or care who's listening, so the system can add new consumers (e.g. a logging service) without touching sensor code, and a backend outage doesn't take down data production.
-- **Backend split into logical responsibilities** (subscribe, store, detect) even while running as a single process initially — this keeps the door open to splitting into microservices later without a rewrite.
+- **Backend split into logical responsibilities**: (subscribe, store, detect) even while running as a single process initially — this keeps the door open to splitting into microservices later without a rewrite.
 - **SQLite via SQLAlchemy ORM**: zero setup to start, but swapping to Postgres/openGauss later is a config change, not a rewrite.
-- **The real numbers for anomaly detection**:validated via a standalone script against synthetic outliers: 9/10 detected, ~1% false positive rate.
+- **The real numbers for anomaly detection**, validated via a standalone script against synthetic outliers: 9/10 detected, ~1% false positive rate.
 - **Dashboard talks only to the REST API**, never the database directly, so the frontend can be replaced independently of the backend.
+
+- **Using python Tags "worth the check"**: Base image shows known CVEs via Docker Scout at the time of writing; acceptable for a demo/learning project, would require base image hardening (distroless, or regular rebuilds) for production use.
 
 
 ## Tech stack

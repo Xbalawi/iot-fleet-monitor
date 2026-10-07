@@ -1,13 +1,18 @@
 import json
 from datetime import datetime, timezone
-import paho.mqtt.client as mqtt
+# from backend import app
 from sqlalchemy.exc import SQLAlchemyError
 from anomaly import is_anomalous, maybe_retrain  
 
 # Import the database and model we just created
 from models import db, Reading
 
-BROKER_HOST = "localhost"
+import paho.mqtt.client as mqtt
+import os
+
+
+# BROKER_HOST = "localhost" Hardcoded for use in a local machine
+BROKER_HOST = os.environ.get("BROKER_HOST", "localhost") #use environment variable if available, otherwise default to localhost
 BROKER_PORT = 1883
 TOPIC = "sensors/readings"
 REQUIRED_FIELDS = {"sensor_id", "type", "value", "timestamp"}
@@ -107,12 +112,16 @@ def start_listener(app):
     
     # Pass the Flask app object into the client so callbacks can use it
     client.user_data_set(app)
-    
+
     print(f"Connecting to MQTT broker at {BROKER_HOST}:{BROKER_PORT}...")
-    client.connect(BROKER_HOST, BROKER_PORT, keepalive=60)
-    
+    try:
+        client.connect(BROKER_HOST, BROKER_PORT, keepalive=60)
+    except (ConnectionRefusedError, OSError) as e:
+        print(f"[WARNING] Could not reach MQTT broker at startup: {e}")
+        print("The app will keep running; paho will keep retrying via loop_start().")
+
     # Non-blocking: loop_start() spins up a background thread for MQTT
     # This leaves the main thread free to run the Flask web server
     client.loop_start()
-    
+
     return client

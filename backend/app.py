@@ -90,4 +90,5 @@ if __name__ == "__main__":
     app = create_app()
     start_listener(app)
     # use_reloader=False prevents the MQTT client from connecting twice in dev mode
-    app.run(port=5000, use_reloader=False)
+    # app.run(port=5000, use_reloader=False) works, but to allow external access, we bind to
+    app.run(host="0.0.0.0", port=5000, use_reloader=False) # Allow external access to the Flask app
