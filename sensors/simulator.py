@@ -3,9 +3,10 @@ import random
 import time
 from datetime import datetime, timezone
 import paho.mqtt.client as mqtt
+import os
 
 # Broker settings
-BROKER_HOST = "localhost"
+BROKER_HOST = os.environ.get("BROKER_HOST", "localhost")
 BROKER_PORT = 1883
 TOPIC = "sensors/readings"
 
