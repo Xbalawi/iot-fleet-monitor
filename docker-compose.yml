@@ -1,4 +1,4 @@
-version: "3.9"
+# version: "3.9" No need to specify version, as it is optional and defaults to the latest version
 
 services:
   mosquitto:
