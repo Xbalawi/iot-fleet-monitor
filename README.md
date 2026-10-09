@@ -1,6 +1,6 @@
 # IoT Fleet Monitor ![Tests](https://github.com/Xbalawi/iot-fleet-monitor/actions/workflows/tests.yml/badge.svg)
 
-![Demo](assets/demo.gif)
+# Simulation ![Demo](assets/demo.gif)
 
 A simulated industrial IoT monitoring system: sensor data flows through an MQTT broker into a Flask backend that stores readings, detects anomalies, and exposes them through a REST API and a live dashboard.
 
@@ -109,14 +109,14 @@ iot-fleet-monitor/
 - [x] Dockerize full stack (docker-compose)
 - [x] GitHub Actions CI (tests + linting)
 - [x] Full documentation pass (setup guide, design rationale)
-- [ ] Demo GIF/video + final polish
+- [x] Demo GIF/video + final polish
 
 ## Setup
 
 **Prerequisites:** Python 3.12+, Docker Desktop
 
 **1. The Most Effecient Way To Run**
-````bash
+```bash
 docker-compose up --build
 ```
 
