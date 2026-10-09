@@ -5,7 +5,7 @@ A simulated industrial IoT monitoring system: sensor data flows through an MQTT 
 Built as a learning/portfolio project to practice distributed-systems patterns (pub/sub messaging), backend engineering, applied ML on streaming data, and DevOps practices (containerization, CI/CD).
 
 # Simulation 
-![Demo](assets/Demo2.gif)
+![Demo](assets/Demo.gif)
 
 ## Architecture
 
