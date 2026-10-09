@@ -101,7 +101,7 @@ iot-fleet-monitor/
 ### Week 3 — Hardening, DevOps, polish
 - [x] Tests
 - [x] Dockerize full stack (docker-compose)
-- [ ] GitHub Actions CI (tests + linting)
+- [x] GitHub Actions CI (tests + linting)
 - [ ] Full documentation pass (setup guide, design rationale)
 - [ ] Demo GIF/video + final polish
 
