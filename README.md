@@ -1,4 +1,4 @@
-# IoT Fleet Monitor
+# IoT Fleet Monitor ![Tests](https://github.com/Xbalawi/iot-fleet-monitor/actions/workflows/tests.yml/badge.svg)
 
 A simulated industrial IoT monitoring system: sensor data flows through an MQTT broker into a Flask backend that stores readings, detects anomalies, and exposes them through a REST API and a live dashboard.
 
@@ -51,6 +51,8 @@ Built as a learning/portfolio project to practice distributed-systems patterns (
 
 - **Using python Tags "worth the check"**: Base image shows known CVEs via Docker Scout at the time of writing; acceptable for a demo/learning project, would require base image hardening (distroless, or regular rebuilds) for production use.
 
+- **"It Works, just wait a bit"**: The data was flowing the entire time; Python was just buffering the simulator’s print() output and periodically flushing it in batches. A monitoring system whose own logs lie about whether it’s working is a genuine operational hazard, even when the underlying system is fine. So we fix it by adding ```bash ENV PYTHONUNBUFFERED=1``` in both Dockerfiles ('backend' & 'sensors').
+
 
 ## Tech stack
 
@@ -65,6 +67,8 @@ Built as a learning/portfolio project to practice distributed-systems patterns (
 
 ```
 iot-fleet-monitor/
+├── .github/workflows
+│   └── test.yml
 ├── sensors/
 │   └── simulator.py
 ├── backend/
@@ -102,12 +106,18 @@ iot-fleet-monitor/
 - [x] Tests
 - [x] Dockerize full stack (docker-compose)
 - [x] GitHub Actions CI (tests + linting)
-- [ ] Full documentation pass (setup guide, design rationale)
+- [x] Full documentation pass (setup guide, design rationale)
 - [ ] Demo GIF/video + final polish
 
 ## Setup
 
 **Prerequisites:** Python 3.12+, Docker Desktop
+
+**1. The Most Effecient Way To Run**
+````bash
+docker-compose up --build
+```
+
 
 **1. Clone the repo and install dependencies**
 ```bash
