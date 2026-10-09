@@ -1,6 +1,6 @@
 # IoT Fleet Monitor ![Tests](https://github.com/Xbalawi/iot-fleet-monitor/actions/workflows/tests.yml/badge.svg)
 
-# Simulation ![Demo](assets/Demo_Simulation.gif)
+# Simulation ![Demo](assets/Demo_Simulation.mp4)
 
 A simulated industrial IoT monitoring system: sensor data flows through an MQTT broker into a Flask backend that stores readings, detects anomalies, and exposes them through a REST API and a live dashboard.
 
