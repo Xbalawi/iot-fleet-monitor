@@ -80,6 +80,8 @@ iot-fleet-monitor/
 │   └── mqtt_listener.py
 ├── dashboard/
 │   └── templates/
+├── assets/
+│   └── Demo.gif
 ├── docker-compose.yml
 ├── requirements.txt
 └── README.md
