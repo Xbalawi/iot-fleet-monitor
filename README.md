@@ -54,7 +54,7 @@ Built as a learning/portfolio project to practice distributed-systems patterns (
 
 - **Using python Tags "worth the check"**: Base image shows known CVEs via Docker Scout at the time of writing; acceptable for a demo/learning project, would require base image hardening (distroless, or regular rebuilds) for production use.
 
-- **"It Works, just wait a bit"**: The data was flowing the entire time; Python was just buffering the simulator’s print() output and periodically flushing it in batches. A monitoring system whose own logs lie about whether it’s working is a genuine operational hazard, even when the underlying system is fine. So we fix it by adding ```bash ENV PYTHONUNBUFFERED=1``` in both Dockerfiles ('backend' & 'sensors').
+- **"It Works, just wait a bit"**: The data was flowing the entire time; Python was just buffering the simulator’s print() output and periodically flushing it in batches. A monitoring system whose own logs lie about whether it’s working is a genuine operational hazard, even when the underlying system is fine. So we fix it by adding ```ENV PYTHONUNBUFFERED=1``` in both Dockerfiles ('backend' & 'sensors').
 
 
 ## Tech stack
