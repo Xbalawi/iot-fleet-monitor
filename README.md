@@ -161,3 +161,6 @@ python sensors/simulator.py
 ## License
 
 MIT
+
+
+# Part 2: MLOps layer
